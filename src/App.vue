@@ -1,62 +1,95 @@
 <template>
-  <h1>Snake Game</h1>
+  <h1 class="page-title">Snake Game</h1>
+  <info-message
+    v-if="showMessage"
+    :username="username"
+    :score="scores"
+    :play-again="play"
+  ></info-message>
   <div class="container">
-    <div class="col">
-      Cell size (px):
-      <input type="number" min="10" v-model.number="cellSize" />
-    </div>
-    <div class="col">
-      Board size (cells):
-      <input type="number" min="5" v-model.number="boardSize" />
-    </div>
-    <div class="col">
-      Speed:
-      <input type="number" min="1" v-model.number="speed" />
-    </div>
-  </div>
-  <div class="container">
-    <snake-canvas :cellSize="cellSize" :boardSize="boardSize" :speed="speed" :isPlaying="isPlaying" />
-  </div>
-  <div class="container">
+    <snake-canvas
+      :cellSize="cellSize"
+      :boardSize="boardSize"
+      :speed="speed"
+      :isPlaying="isPlaying"
+      :stop="stop"
+      :score="scores"
+      :add-score="addScore"
+      :speed-increase="speedIncrease"
+    />
     <div class="controls">
+      <div class="form-control">
+        <label>Username</label>
+        <input type="text" v-model="username" />
+      </div>
       <div class="scores">Scores: {{ scores }}</div>
-      <button class="play-btn" @click="gameBtn">{{ isPlaying ? 'Stop' : 'Play' }}</button>
+      <button class="play-btn" v-on="playStop">
+        {{ isPlaying ? 'Stop' : 'Play' }}
+      </button>
     </div>
+  </div>
+  <div class="container">
+    <rankings></rankings>
   </div>
 </template>
 
 <script>
+import InfoMessage from './components/InfoMessage.vue'
+import Rankings from './components/Rankings.vue'
 import SnakeCanvas from './components/SnakeCanvas.vue'
 export default {
   name: 'App',
-  components: { SnakeCanvas },
+  components: { SnakeCanvas, InfoMessage, Rankings },
   data() {
     return {
-      cellSize: 10,
+      cellSize: 20,
       boardSize: 30,
-      speed: 1,
+      speed: 10,
       scores: 0,
       isPlaying: false,
+      showMessage: false,
+      username: '',
+      rankingsList: []
     }
   },
+  computed: {
+    playStop() {
+      if (this.isPlaying) {
+        return { click: this.stop }
+      }
+      return { click: this.play }
+    },
+  },
   methods: {
-    gameBtn() {
-      this.isPlaying = !this.isPlaying
-    }
-  }
+    play() {
+      this.isPlaying = true
+      this.scores = 0
+      this.showMessage = false
+    },
+    stop() {
+      this.isPlaying = false
+      this.showMessage = true
+      setTimeout(() => (this.showMessage = false), 3000)
+    },
+    speedIncrease(newSpeed) {
+      this.speed += newSpeed
+    },
+    addScore(score) {
+      this.scores += score
+    },
+  },
 }
 </script>
 
-<style scoped>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
+
 body {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   height: 100vh;
+  font-family: 'Ubuntu', sans-serif;
 }
 
-h1 {
+.page-title {
   text-align: center;
   margin: 3rem 0;
 }
@@ -65,9 +98,6 @@ h1 {
   max-width: 1200px;
   margin: 0 auto;
   text-align: center;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  column-gap: 3rem;
 }
 
 .col {
@@ -84,18 +114,24 @@ h1 {
 }
 
 .controls {
-  grid-column: 2;
   margin: 0 auto;
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+.form-control {
+  display: flex;
+  flex-direction: column;
+  margin-left: 2rem;
 }
 
 .scores {
-  margin-right: 2rem;
+  margin-left: 2rem;
 }
 
 .play-btn {
   cursor: pointer;
   padding: 0.75rem 0.5rem;
+  margin-left: 2rem;
 }
 </style>
