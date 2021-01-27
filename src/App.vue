@@ -5,6 +5,8 @@
     :username="username"
     :score="scores"
     :play-again="play"
+    :capitalize="capitalizeName"
+    :close="closeMessage"
   ></info-message>
   <div class="container">
     <snake-canvas
@@ -19,17 +21,16 @@
     />
     <div class="controls">
       <div class="form-control">
-        <label>Username</label>
-        <input type="text" v-model="username" />
+        <input type="text" v-model="username" placeholder="Username"/>
       </div>
-      <div class="scores">Scores: {{ scores }}</div>
-      <button class="play-btn" v-on="playStop">
+      <div class="ml-2">Scores: {{ scores }}</div>
+      <button class="btn ml-2" v-on="playStop">
         {{ isPlaying ? 'Stop' : 'Play' }}
       </button>
     </div>
   </div>
   <div class="container">
-    <rankings></rankings>
+    <rankings :rankingsList="rankingsList"></rankings>
   </div>
 </template>
 
@@ -69,7 +70,12 @@ export default {
     stop() {
       this.isPlaying = false
       this.showMessage = true
-      setTimeout(() => (this.showMessage = false), 3000)
+      if(this.username) {
+
+        this.rankingsList.push({username: this.capitalizeName(this.username), score: this.scores})
+      } else {
+        this.rankingsList.push({username: 'Loser', score: this.scores})
+      }
     },
     speedIncrease(newSpeed) {
       this.speed += newSpeed
@@ -77,6 +83,12 @@ export default {
     addScore(score) {
       this.scores += score
     },
+    capitalizeName(name){
+          return name.charAt(0).toUpperCase() + name.slice(1)
+    },
+    closeMessage(){
+      this.showMessage = false
+    }
   },
 }
 </script>
@@ -87,6 +99,7 @@ export default {
 body {
   height: 100vh;
   font-family: 'Ubuntu', sans-serif;
+   overflow: hidden;
 }
 
 .page-title {
@@ -122,16 +135,20 @@ body {
 .form-control {
   display: flex;
   flex-direction: column;
-  margin-left: 2rem;
 }
 
-.scores {
+.ml-2{
   margin-left: 2rem;
 }
-
-.play-btn {
+.mb-1{
+  margin-bottom: 1rem;
+}
+.btn {
   cursor: pointer;
-  padding: 0.75rem 0.5rem;
-  margin-left: 2rem;
+  padding: 1rem 3rem;
+  background: rgb(100, 87, 211);
+  color: #fff;
+  border: 1px solid rgb(100, 87, 211);
+  border-radius: 5px;
 }
 </style>

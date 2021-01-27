@@ -1,19 +1,21 @@
 <template>
     <h2>Ranking List</h2>
     <ul class="rankings">
-        <li>{{username}} : {{score}}</li>
+        <li v-for="(rank,i) in rankingsList" :key="i">{{rank.username}} : {{rank.score}}</li>
     </ul>
 </template>
 
 <script>
     export default {
         props: {
-            username: String,
-            score: Number
+            rankingsList: Array
         }
     }
 </script>
 
 <style scoped>
-
+.rankings{
+    list-style: none;
+    padding: 0;
+}
 </style>
